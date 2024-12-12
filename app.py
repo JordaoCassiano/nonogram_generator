@@ -52,7 +52,7 @@ def save_image(board, restrictions, filename):
 
 def render_grid(board):
     for i in range(board.shape[0]):
-        cols = st.columns(board.shape[1], gap="none")
+        cols = st.columns(board.shape[1])  # Removed invalid gap parameter
         for j, col in enumerate(cols):
             key = f"cell_{i}_{j}"
             if col.button("⬛" if board[i, j] == 1 else "⬜", key=key):
