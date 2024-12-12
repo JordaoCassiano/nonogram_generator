@@ -58,7 +58,27 @@ def render_grid(board):
             if col.button("⬛" if board[i, j] == 1 else "⬜", key=key):
                 board[i, j] = 1 - board[i, j]
 
+# Introdução sobre o aplicativo
 st.title("Nonograma Criador")
+st.markdown(
+    """
+    Bem-vindo ao **Nonograma Criador**, uma ferramenta interativa que permite criar e resolver **nonogramas**!
+
+    ### O que é um Nonograma?
+    Um **Nonograma** é um quebra-cabeça lógico no qual você preenche uma grade com base nas pistas fornecidas para cada linha e coluna. 
+    O objetivo é revelar uma imagem escondida ao preencher corretamente as células. Cada pista representa um grupo de células consecutivas preenchidas.
+
+    ### Sobre este aplicativo
+    - Defina a dimensão da grade (linhas x colunas).
+    - Clique nas células para preencher ou apagar.
+    - Veja as restrições geradas automaticamente para as linhas e colunas.
+    - Exporte o resultado como uma imagem.
+
+    ### Criado por Jordão
+    Este aplicativo foi desenvolvido com carinho por Jordão, apaixonado por quebra-cabeças e tecnologia. Esperamos que você se divirta!
+    """
+)
+
 dimensions = st.text_input("Insira a dimensão do nonograma (N x M, separado por vírgula):")
 
 if dimensions:
