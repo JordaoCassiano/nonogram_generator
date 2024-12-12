@@ -60,8 +60,8 @@ if dimensions:
 
         st.write("Clique nas células para preenchê-las:")
         for i in range(rows):
-            cols = st.columns(cols)
-            for j, col in enumerate(cols):
+            cols_layout = st.columns(cols)
+            for j, col in enumerate(cols_layout):
                 if st.session_state.get(f"cell_{i}_{j}", False):
                     board[i, j] = 1
                 if col.button("⬛", key=f"cell_{i}_{j}"):
@@ -73,6 +73,7 @@ if dimensions:
 
         if st.button("Gerar imagens"):
             full_image = save_image(board, restrictions, "nonograma_resultado.png")
+
             filled_positions = list(zip(*np.where(board == 1)))
             random.shuffle(filled_positions)
 
