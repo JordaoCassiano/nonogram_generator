@@ -50,39 +50,25 @@ def save_image(board, restrictions, filename):
     buffer.seek(0)
     return buffer
 
-st.title("Nonograma Criador")
-dimensions = st.text_input("Insira a dimensão do nonograma (N x M, separado por vírgula):")
+def render_grid(board):
+    rows, cols = board.shape
+    cell_size = 30
+    canvas = Image.new("RGB", (cols * cell_size, rows * cell_size), "white")
+    draw = ImageDraw.Draw(canvas)
 
-if dimensions:
-    try:
-        rows, cols = map(int, dimensions.split(","))
-        if "board" not in st.session_state:
-            st.session_state.board = np.zeros((rows, cols), dtype=int)
+    for i in range(rows):
+        for j in range(cols):
+            x0, y0 = j * cell_size, i * cell_size
+            x1, y1 = x0 + cell_size, y0 + cell_size
+            color = "black" if board[i, j] == 1 else "white"
+            draw.rectangle([x0, y0, x1, y1], fill=color, outline="gray")
 
-        st.write("Clique nas células para preenchê-las:")
-        for i in range(rows):
-            cols_layout = st.columns(cols)
-            for j, col in enumerate(cols_layout):
-                if col.button("⬛" if st.session_state.board[i, j] == 1 else "⬜", key=f"cell_{i}_{j}"):
-                    st.session_state.board[i, j] = 1 - st.session_state.board[i, j]
+    return canvas
 
-        restrictions = create_restrictions(st.session_state.board)
-        st.write("Restrição por linhas:", restrictions["rows"])
-        st.write("Restrição por colunas:", restrictions["cols"])
-
-        if st.button("Gerar imagens"):
-            full_image = save_image(st.session_state.board, restrictions, "nonograma_resultado.png")
-
-            filled_positions = list(zip(*np.where(st.session_state.board == 1)))
-            random.shuffle(filled_positions)
-
-            partial_board = np.zeros_like(st.session_state.board)
-            for r, c in filled_positions[: len(filled_positions) // 5]:
-                partial_board[r, c] = 1
-
-            partial_image = save_image(partial_board, restrictions, "nonograma_parcial.png")
-            st.download_button("Baixar imagem completa", full_image, "nonograma_resultado.png")
-            st.download_button("Baixar imagem parcial", partial_image, "nonograma_parcial.png")
-
-    except ValueError:
-        st.error("Dimensões inválidas! Por favor, insira no formato N,M.")
+def grid_interaction(board):
+    rows, cols = board.shape
+    for i in range(rows):
+        for j in range(cols):
+            key = f"cell_{i}_{j}"
+            if st.button(" ", key=key, args=(board, i, j), help="Clique para alterar"):
+                board[i, j] = 1 - board[i, j]
