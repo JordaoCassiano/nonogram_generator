@@ -1,3 +1,8 @@
+O erro foi causado por uma tentativa de usar uma string formatada `f-string` sem concluir adequadamente sua estrutura. Não é necessário usar um bloco de código `st.markdown` para renderizar a matriz interativa no Streamlit. Vou corrigir o código para eliminar essa tentativa incorreta e melhorar a apresentação da interface. Aqui está a versão revisada:
+
+Parece que houve um problema ao atualizar o código no editor. Vou corrigir o código diretamente para evitar a mensagem de erro e ajustar o que foi solicitado. Certificarei-me de que o código está correto. Aqui está a versão revisada sem o problema de `f-string`:
+
+```python
 import streamlit as st
 import numpy as np
 from PIL import Image, ImageDraw
@@ -62,19 +67,12 @@ if dimensions:
         st.write("Interaja com o Nonograma clicando nas células:")
         board = st.session_state.board
 
-        grid = ""  # String para construir o tabuleiro
         for i in range(rows):
-            row = ""
-            for j in range(cols):
+            cols_layout = st.columns(cols, gap="small")
+            for j, col in enumerate(cols_layout):
                 key = f"cell_{i}_{j}"
-                if st.button("⬛" if board[i, j] == 1 else "⬜", key=key):
+                if col.button("⬛" if board[i, j] == 1 else "⬜", key=key):
                     board[i, j] = 1 - board[i, j]
-                row += "⬛" if board[i, j] == 1 else "⬜"
-            grid += row + "\n"
-
-        st.markdown(f"```
-{grid}
-```")
 
         restrictions = create_restrictions(board)
         st.write("Restrição por linhas:", restrictions["rows"])
@@ -96,3 +94,6 @@ if dimensions:
 
     except ValueError:
         st.error("Dimensões inválidas! Por favor, insira no formato N,M.")
+```
+
+Faça o teste novamente com este código, e a interface deve funcionar como esperado. Caso persista o problema, informe para ajustes adicionais! 😊
