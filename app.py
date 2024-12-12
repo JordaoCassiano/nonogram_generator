@@ -50,6 +50,14 @@ def save_image(board, restrictions, filename):
     buffer.seek(0)
     return buffer
 
+def render_grid(board):
+    for i in range(board.shape[0]):
+        cols = st.columns(board.shape[1], gap="none")
+        for j, col in enumerate(cols):
+            key = f"cell_{i}_{j}"
+            if col.button("⬛" if board[i, j] == 1 else "⬜", key=key):
+                board[i, j] = 1 - board[i, j]
+
 st.title("Nonograma Criador")
 dimensions = st.text_input("Insira a dimensão do nonograma (N x M, separado por vírgula):")
 
@@ -60,26 +68,19 @@ if dimensions:
             st.session_state.board = np.zeros((rows, cols), dtype=int)
 
         st.write("Interaja com o Nonograma clicando nas células:")
-        board = st.session_state.board
+        render_grid(st.session_state.board)
 
-        for i in range(rows):
-            cols_layout = st.columns(cols, gap="small")
-            for j, col in enumerate(cols_layout):
-                key = f"cell_{i}_{j}"
-                if col.button("⬛" if board[i, j] == 1 else "⬜", key=key):
-                    board[i, j] = 1 - board[i, j]
-
-        restrictions = create_restrictions(board)
+        restrictions = create_restrictions(st.session_state.board)
         st.write("Restrição por linhas:", restrictions["rows"])
         st.write("Restrição por colunas:", restrictions["cols"])
 
         if st.button("Gerar imagens"):
-            full_image = save_image(board, restrictions, "nonograma_resultado.png")
+            full_image = save_image(st.session_state.board, restrictions, "nonograma_resultado.png")
 
-            filled_positions = list(zip(*np.where(board == 1)))
+            filled_positions = list(zip(*np.where(st.session_state.board == 1)))
             random.shuffle(filled_positions)
 
-            partial_board = np.zeros_like(board)
+            partial_board = np.zeros_like(st.session_state.board)
             for r, c in filled_positions[: len(filled_positions) // 5]:
                 partial_board[r, c] = 1
 
