@@ -50,21 +50,6 @@ def save_image(board, restrictions, filename):
     buffer.seek(0)
     return buffer
 
-def render_grid(board):
-    rows, cols = board.shape
-    cell_size = 30
-    canvas = Image.new("RGB", (cols * cell_size, rows * cell_size), "white")
-    draw = ImageDraw.Draw(canvas)
-
-    for i in range(rows):
-        for j in range(cols):
-            x0, y0 = j * cell_size, i * cell_size
-            x1, y1 = x0 + cell_size, y0 + cell_size
-            color = "black" if board[i, j] == 1 else "white"
-            draw.rectangle([x0, y0, x1, y1], fill=color, outline="gray")
-
-    return canvas
-
 st.title("Nonograma Criador")
 dimensions = st.text_input("Insira a dimensão do nonograma (N x M, separado por vírgula):")
 
@@ -76,15 +61,20 @@ if dimensions:
 
         st.write("Interaja com o Nonograma clicando nas células:")
         board = st.session_state.board
-        canvas = render_grid(board)
 
-        st.image(canvas, caption="Nonograma", use_column_width=True)
-
+        grid = ""  # String para construir o tabuleiro
         for i in range(rows):
-            cols_layout = st.columns(cols, gap="small")
-            for j, col in enumerate(cols_layout):
-                if col.button("⬛" if board[i, j] == 1 else "⬜", key=f"cell_{i}_{j}"):
+            row = ""
+            for j in range(cols):
+                key = f"cell_{i}_{j}"
+                if st.button("⬛" if board[i, j] == 1 else "⬜", key=key):
                     board[i, j] = 1 - board[i, j]
+                row += "⬛" if board[i, j] == 1 else "⬜"
+            grid += row + "\n"
+
+        st.markdown(f"```
+{grid}
+```")
 
         restrictions = create_restrictions(board)
         st.write("Restrição por linhas:", restrictions["rows"])
