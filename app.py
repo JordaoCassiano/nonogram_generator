@@ -52,7 +52,7 @@ def save_image(board, restrictions, filename):
 
 def render_grid(board):
     for i in range(board.shape[0]):
-        cols = st.columns(board.shape[1])  # Removed invalid gap parameter
+        cols = st.columns(board.shape[1])
         for j, col in enumerate(cols):
             key = f"cell_{i}_{j}"
             if col.button("⬛" if board[i, j] == 1 else "⬜", key=key):
@@ -64,7 +64,9 @@ dimensions = st.text_input("Insira a dimensão do nonograma (N x M, separado por
 if dimensions:
     try:
         rows, cols = map(int, dimensions.split(","))
-        if "board" not in st.session_state:
+
+        # Atualiza o tabuleiro caso as dimensões sejam alteradas
+        if "board" not in st.session_state or st.session_state.board.shape != (rows, cols):
             st.session_state.board = np.zeros((rows, cols), dtype=int)
 
         st.write("Interaja com o Nonograma clicando nas células:")
