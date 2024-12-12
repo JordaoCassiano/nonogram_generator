@@ -65,10 +65,44 @@ def render_grid(board):
 
     return canvas
 
-def grid_interaction(board):
-    rows, cols = board.shape
-    for i in range(rows):
-        for j in range(cols):
-            key = f"cell_{i}_{j}"
-            if st.button(" ", key=key, args=(board, i, j), help="Clique para alterar"):
-                board[i, j] = 1 - board[i, j]
+st.title("Nonograma Criador")
+dimensions = st.text_input("Insira a dimensão do nonograma (N x M, separado por vírgula):")
+
+if dimensions:
+    try:
+        rows, cols = map(int, dimensions.split(","))
+        if "board" not in st.session_state:
+            st.session_state.board = np.zeros((rows, cols), dtype=int)
+
+        st.write("Interaja com o Nonograma clicando nas células:")
+        board = st.session_state.board
+        canvas = render_grid(board)
+
+        st.image(canvas, caption="Nonograma", use_column_width=True)
+
+        for i in range(rows):
+            cols_layout = st.columns(cols, gap="small")
+            for j, col in enumerate(cols_layout):
+                if col.button("⬛" if board[i, j] == 1 else "⬜", key=f"cell_{i}_{j}"):
+                    board[i, j] = 1 - board[i, j]
+
+        restrictions = create_restrictions(board)
+        st.write("Restrição por linhas:", restrictions["rows"])
+        st.write("Restrição por colunas:", restrictions["cols"])
+
+        if st.button("Gerar imagens"):
+            full_image = save_image(board, restrictions, "nonograma_resultado.png")
+
+            filled_positions = list(zip(*np.where(board == 1)))
+            random.shuffle(filled_positions)
+
+            partial_board = np.zeros_like(board)
+            for r, c in filled_positions[: len(filled_positions) // 5]:
+                partial_board[r, c] = 1
+
+            partial_image = save_image(partial_board, restrictions, "nonograma_parcial.png")
+            st.download_button("Baixar imagem completa", full_image, "nonograma_resultado.png")
+            st.download_button("Baixar imagem parcial", partial_image, "nonograma_parcial.png")
+
+    except ValueError:
+        st.error("Dimensões inválidas! Por favor, insira no formato N,M.")
