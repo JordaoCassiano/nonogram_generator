@@ -71,8 +71,11 @@ if dimensions:
         render_grid(st.session_state.board)
 
         restrictions = create_restrictions(st.session_state.board)
-        st.write("Restrição por linhas:", restrictions["rows"])
-        st.write("Restrição por colunas:", restrictions["cols"])
+        st.markdown("### Restrições por linhas")
+        st.markdown("<br>".join([", ".join(map(str, res)) for res in restrictions["rows"]]), unsafe_allow_html=True)
+
+        st.markdown("### Restrições por colunas")
+        st.markdown("<br>".join([", ".join(map(str, res)) for res in restrictions["cols"]]), unsafe_allow_html=True)
 
         if st.button("Gerar imagens"):
             full_image = save_image(st.session_state.board, restrictions, "nonograma_resultado.png")
